@@ -3,7 +3,195 @@
 
 //#define WINDOW_PREFER_GLUT
 
-#if defined(WINDOW_PREFER_GLUT)
+#if defined(USE_EGL)
+
+// EGL headless rendering (Linux default, Docker-friendly)
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <iostream>
+#include <cstring>
+#include <vector>
+
+class LiteWindow
+{
+    EGLDisplay eglDisplay;
+    EGLContext eglContext;
+    EGLSurface eglSurface;
+    EGLConfig  eglConfig;
+public:
+    LiteWindow() 
+        : eglDisplay(EGL_NO_DISPLAY)
+        , eglContext(EGL_NO_CONTEXT) 
+        , eglSurface(EGL_NO_SURFACE)
+        , eglConfig(nullptr)
+    {}
+    
+    int IsValid() {
+        return eglContext != EGL_NO_CONTEXT;
+    }
+    
+    virtual ~LiteWindow() {
+        if (eglContext != EGL_NO_CONTEXT) {
+            eglMakeCurrent(eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+            eglDestroyContext(eglDisplay, eglContext);
+        }
+        if (eglSurface != EGL_NO_SURFACE) {
+            eglDestroySurface(eglDisplay, eglSurface);
+        }
+        if (eglDisplay != EGL_NO_DISPLAY) {
+            eglTerminate(eglDisplay);
+        }
+    }
+    
+    void Create(int x = 0, int y = 0, const char* display = NULL) {
+        if (eglDisplay != EGL_NO_DISPLAY) return;
+        
+        // ── Level 1: EGL_EXT_device_enumeration ─────────────────────────────────
+        auto eglQueryDevicesEXT_ =
+            (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
+        auto eglGetPlatformDisplayEXT_ =
+            (PFNEGLGETPLATFORMDISPLAYEXTPROC)eglGetProcAddress("eglGetPlatformDisplayEXT");
+        auto eglQueryDeviceStringEXT_ =
+            (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
+        if (eglQueryDevicesEXT_ && eglGetPlatformDisplayEXT_) {
+            EGLint num_dev = 0;
+            eglQueryDevicesEXT_(0, nullptr, &num_dev);
+            if (num_dev > 0) {
+                std::vector<EGLDeviceEXT> devs(num_dev);
+                eglQueryDevicesEXT_(num_dev, devs.data(), &num_dev);
+                int nvidia_idx = -1;
+                for (int i = 0; i < num_dev && eglQueryDeviceStringEXT_; ++i) {
+                    const char* exts = eglQueryDeviceStringEXT_(devs[i], EGL_EXTENSIONS);
+                    if (exts && std::strstr(exts, "EGL_NV_")) {
+                        nvidia_idx = i;
+                        break;
+                    }
+                }
+                int idx = (nvidia_idx >= 0) ? nvidia_idx : 0;
+                EGLDisplay d = eglGetPlatformDisplayEXT_(
+                    EGL_PLATFORM_DEVICE_EXT, devs[idx], nullptr);
+                if (d != EGL_NO_DISPLAY) {
+                    eglDisplay = d;
+                    if (nvidia_idx >= 0)
+                        std::cerr << "[SiftGPU EGL] selected NVIDIA device " << nvidia_idx << "\n";
+                    else
+                        std::cerr << "[SiftGPU EGL] selected device 0 (no NVIDIA found)\n";
+                }
+            }
+        }
+        // ── Level 2: EGL_MESA_platform_surfaceless ───────────────────────────────
+        if (eglDisplay == EGL_NO_DISPLAY && eglGetPlatformDisplayEXT_) {
+            eglDisplay = eglGetPlatformDisplayEXT_(
+                EGL_PLATFORM_SURFACELESS_MESA, EGL_DEFAULT_DISPLAY, nullptr);
+            if (eglDisplay != EGL_NO_DISPLAY)
+                std::cerr << "[SiftGPU EGL] using MESA surfaceless\n";
+        }
+        // ── Level 3: fallback ────────────────────────────────────────────────────
+        if (eglDisplay == EGL_NO_DISPLAY) {
+            eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+        }
+        if (eglDisplay == EGL_NO_DISPLAY) {
+            std::cerr << "ERROR: eglGetDisplay failed\n";
+            return;
+        }
+        
+        // Initialize EGL
+        EGLint major, minor;
+        if (!eglInitialize(eglDisplay, &major, &minor)) {
+            std::cerr << "ERROR: eglInitialize failed\n";
+            eglDisplay = EGL_NO_DISPLAY;
+            return;
+        }
+        
+        if (display) {
+            std::cout << "EGL initialized: " << major << "." << minor << "\n";
+        }
+        
+        // Choose EGL config for OpenGL + Pbuffer
+        EGLint configAttribs[] = {
+            EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+            EGL_RED_SIZE, 8,
+            EGL_GREEN_SIZE, 8,
+            EGL_BLUE_SIZE, 8,
+            EGL_ALPHA_SIZE, 8,
+            EGL_DEPTH_SIZE, 16,
+            EGL_NONE
+        };
+        
+        EGLint numConfigs;
+        if (!eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigs) || numConfigs == 0) {
+            std::cerr << "ERROR: eglChooseConfig failed\n";
+            eglTerminate(eglDisplay);
+            eglDisplay = EGL_NO_DISPLAY;
+            return;
+        }
+        
+        // Bind OpenGL API (not OpenGL ES)
+        if (!eglBindAPI(EGL_OPENGL_API)) {
+            std::cerr << "ERROR: eglBindAPI(EGL_OPENGL_API) failed\n";
+            eglTerminate(eglDisplay);
+            eglDisplay = EGL_NO_DISPLAY;
+            return;
+        }
+        
+        // Create Pbuffer surface (headless, no window needed)
+        EGLint pbufferAttribs[] = {
+            EGL_WIDTH, 1024,
+            EGL_HEIGHT, 1024,
+            EGL_NONE
+        };
+        eglSurface = eglCreatePbufferSurface(eglDisplay, eglConfig, pbufferAttribs);
+        if (eglSurface == EGL_NO_SURFACE) {
+            std::cerr << "ERROR: eglCreatePbufferSurface failed\n";
+            eglTerminate(eglDisplay);
+            eglDisplay = EGL_NO_DISPLAY;
+            return;
+        }
+        
+        // Create OpenGL context (Compatibility profile for SiftGPU)
+        // SiftGPU requires compatibility mode, not core profile
+        EGLint ctxAttribs[] = {
+            EGL_CONTEXT_MAJOR_VERSION, 2,
+            EGL_CONTEXT_MINOR_VERSION, 1,
+            EGL_NONE
+        };
+        eglContext = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, ctxAttribs);
+        if (eglContext == EGL_NO_CONTEXT) {
+            // Fallback: try without version specification
+            EGLint ctxAttribsDefault[] = { EGL_NONE };
+            eglContext = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, ctxAttribsDefault);
+        }
+        if (eglContext == EGL_NO_CONTEXT) {
+            std::cerr << "ERROR: eglCreateContext failed (tried OpenGL 2.1 and default)\n";
+            eglDestroySurface(eglDisplay, eglSurface);
+            eglTerminate(eglDisplay);
+            eglDisplay = EGL_NO_DISPLAY;
+            eglSurface = EGL_NO_SURFACE;
+            return;
+        }
+        
+        // Make context current
+        if (!eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {
+            std::cerr << "ERROR: eglMakeCurrent failed\n";
+            eglDestroyContext(eglDisplay, eglContext);
+            eglDestroySurface(eglDisplay, eglSurface);
+            eglTerminate(eglDisplay);
+            eglDisplay = EGL_NO_DISPLAY;
+            eglContext = EGL_NO_CONTEXT;
+            eglSurface = EGL_NO_SURFACE;
+            return;
+        }
+    }
+    
+    void MakeCurrent() {
+        if (eglContext != EGL_NO_CONTEXT) {
+            eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
+        }
+    }
+};
+
+#elif defined(WINDOW_PREFER_GLUT)
 
 #ifdef __APPLE__
 	#include "GLUT/glut.h"
@@ -11,6 +199,7 @@
 	#include "GL/glut.h"
 #endif
 //for apple, use GLUT to create the window..
+
 class LiteWindow
 {
     int glut_id;

@@ -12,10 +12,10 @@
 //	documentation for educational, research and non-profit purposes, without
 //	fee, and without a written agreement is hereby granted, provided that the
 //	above copyright notice and the following paragraph appear in all copies.
-//	
+//
 //	The University of North Carolina at Chapel Hill make no representations
 //	about the suitability of this software for any purpose. It is provided
-//	'as is' without express or implied warranty. 
+//	'as is' without express or implied warranty.
 //
 //	Please send BUG REPORTS to ccwu@cs.unc.edu
 //
@@ -36,7 +36,7 @@ using namespace std;
 
 #include "GlobalUtil.h"
 
-#include "GLTexImage.h" 
+#include "GLTexImage.h"
 #include "FrameBufferObject.h"
 #include "ShaderMan.h"
 
@@ -45,11 +45,6 @@ using namespace std;
 
 #ifndef SIFTGPU_NO_DEVIL
     #include "IL/il.h"
-    #if  defined(_WIN64)
-	    #pragma comment(lib, "../../lib/DevIL64.lib")
-    #elif  defined(_WIN32) 
-	    #pragma comment(lib, "../../lib/DevIL.lib")
-    #endif
 #else
 	#include <string.h>
 #endif
@@ -100,7 +95,7 @@ void GLTexImage::InitTexture( int width,  int height, int clamp_to_edge)
 {
 
 	if(_texID && width == _texWidth && height == _texHeight ) return;
-	if(_texID==0)	glGenTextures(1, &_texID); 
+	if(_texID==0)	glGenTextures(1, &_texID);
 
 	_texWidth = _imgWidth = _drawWidth = width;
 	_texHeight = _imgHeight = _drawHeight = height;
@@ -109,20 +104,20 @@ void GLTexImage::InitTexture( int width,  int height, int clamp_to_edge)
 
 	if(clamp_to_edge)
 	{
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}else
 	{
 		//out of bound tex read returns 0??
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	}
-	glTexParameteri(_texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
-	glTexParameteri(_texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(_texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(_texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	glTexImage2D(_texTarget, 0, _iTexFormat, 
-		_texWidth, _texHeight, 0, GL_RGBA, GL_FLOAT, NULL); 
+	glTexImage2D(_texTarget, 0, _iTexFormat,
+		_texWidth, _texHeight, 0, GL_RGBA, GL_FLOAT, NULL);
 	CheckErrorsGL("glTexImage2D");
 
 
@@ -135,7 +130,7 @@ void GLTexImage::InitTexture( int width,  int height, int clamp_to_edge, GLuint 
 {
 
 	if(_texID && width == _texWidth && height == _texHeight ) return;
-	if(_texID==0)	glGenTextures(1, &_texID); 
+	if(_texID==0)	glGenTextures(1, &_texID);
 
 	_texWidth = _imgWidth = _drawWidth = width;
 	_texHeight = _imgHeight = _drawHeight = height;
@@ -144,19 +139,19 @@ void GLTexImage::InitTexture( int width,  int height, int clamp_to_edge, GLuint 
 
 	if(clamp_to_edge)
 	{
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}else
 	{
 		//out of bound tex read returns 0??
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	}
-	glTexParameteri(_texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
-	glTexParameteri(_texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(_texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(_texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	glTexImage2D(_texTarget, 0, format, _texWidth, _texHeight, 0, GL_RGBA, GL_FLOAT, NULL); 
+	glTexImage2D(_texTarget, 0, format, _texWidth, _texHeight, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	UnbindTex();
 
@@ -175,10 +170,10 @@ void  GLTexImage::UnbindTex()
 void  GLTexImage::DrawQuad()
 {
 	glBegin (GL_QUADS);
-		glTexCoord2i ( 0			,   0   ); 				glVertex2i   ( 0			,		0   ); 
-		glTexCoord2i ( 0			,   _drawHeight  );		glVertex2i   ( 0			,		_drawHeight   ); 
- 		glTexCoord2i ( _drawWidth   ,   _drawHeight  ); 	glVertex2i   ( _drawWidth	,		_drawHeight   ); 
-		glTexCoord2i ( _drawWidth	,   0   ); 				glVertex2i   ( _drawWidth	,		0   ); 
+		glTexCoord2i ( 0			,   0   ); 				glVertex2i   ( 0			,		0   );
+		glTexCoord2i ( 0			,   _drawHeight  );		glVertex2i   ( 0			,		_drawHeight   );
+ 		glTexCoord2i ( _drawWidth   ,   _drawHeight  ); 	glVertex2i   ( _drawWidth	,		_drawHeight   );
+		glTexCoord2i ( _drawWidth	,   0   ); 				glVertex2i   ( _drawWidth	,		0   );
 	glEnd ();
 	glFlush();
 }
@@ -217,17 +212,17 @@ void GLTexImage::ZeroHistoMargin(int width, int height)
 		glBegin(GL_QUADS);
 		if(right > width && _texWidth > width)
 		{
-			glTexCoord2i ( width	,   0   ); 				glVertex2i   ( width	,		0   ); 
-			glTexCoord2i ( width	,   bottom  );			glVertex2i   ( width	,		bottom   ); 
-			glTexCoord2i ( right	,   bottom  ); 			glVertex2i   ( right	,		bottom   ); 
-			glTexCoord2i ( right	,   0   ); 				glVertex2i   ( right	,		0   ); 	
+			glTexCoord2i ( width	,   0   ); 				glVertex2i   ( width	,		0   );
+			glTexCoord2i ( width	,   bottom  );			glVertex2i   ( width	,		bottom   );
+			glTexCoord2i ( right	,   bottom  ); 			glVertex2i   ( right	,		bottom   );
+			glTexCoord2i ( right	,   0   ); 				glVertex2i   ( right	,		0   );
 		}
 		if(bottom>height && _texHeight > height)
 		{
-			glTexCoord2i ( 0		,   height ); 		glVertex2i   ( 0		,		height   ); 
-			glTexCoord2i ( 0		,   bottom	);		glVertex2i   ( 0		,		bottom		 ); 
-			glTexCoord2i ( width	,   bottom	); 		glVertex2i   ( width	,		bottom		 ); 
-			glTexCoord2i ( width	,   height	); 		glVertex2i   ( width	,		height	 ); 
+			glTexCoord2i ( 0		,   height ); 		glVertex2i   ( 0		,		height   );
+			glTexCoord2i ( 0		,   bottom	);		glVertex2i   ( 0		,		bottom		 );
+			glTexCoord2i ( width	,   bottom	); 		glVertex2i   ( width	,		bottom		 );
+			glTexCoord2i ( width	,   height	); 		glVertex2i   ( width	,		height	 );
 		}
 		glEnd();
 		glFlush();
@@ -240,17 +235,17 @@ void GLTexImage::DrawMargin(int right, int bottom)
 	glBegin(GL_QUADS);
 	if(right > _drawWidth)
 	{
-		glTexCoord2i ( _drawWidth	,   0   ); 				glVertex2i   ( _drawWidth	,		0   ); 
-		glTexCoord2i ( _drawWidth	,   bottom  );			glVertex2i   ( _drawWidth	,		bottom   ); 
-		glTexCoord2i ( right		,   bottom  ); 			glVertex2i   ( right		,		bottom   ); 
-		glTexCoord2i ( right		,   0   ); 				glVertex2i   ( right		,		0   ); 	
+		glTexCoord2i ( _drawWidth	,   0   ); 				glVertex2i   ( _drawWidth	,		0   );
+		glTexCoord2i ( _drawWidth	,   bottom  );			glVertex2i   ( _drawWidth	,		bottom   );
+		glTexCoord2i ( right		,   bottom  ); 			glVertex2i   ( right		,		bottom   );
+		glTexCoord2i ( right		,   0   ); 				glVertex2i   ( right		,		0   );
 	}
 	if(bottom>_drawHeight)
 	{
-		glTexCoord2i ( 0			,   _drawHeight ); 		glVertex2i   ( 0			,		_drawHeight   ); 
-		glTexCoord2i ( 0			,   bottom		);		glVertex2i   ( 0			,		bottom		 ); 
-		glTexCoord2i ( _drawWidth	,   bottom		); 		glVertex2i   ( _drawWidth	,		bottom		 ); 
-		glTexCoord2i ( _drawWidth	,   _drawHeight	); 		glVertex2i   ( _drawWidth	,		_drawHeight	 ); 
+		glTexCoord2i ( 0			,   _drawHeight ); 		glVertex2i   ( 0			,		_drawHeight   );
+		glTexCoord2i ( 0			,   bottom		);		glVertex2i   ( 0			,		bottom		 );
+		glTexCoord2i ( _drawWidth	,   bottom		); 		glVertex2i   ( _drawWidth	,		bottom		 );
+		glTexCoord2i ( _drawWidth	,   _drawHeight	); 		glVertex2i   ( _drawWidth	,		_drawHeight	 );
 	}
 	glEnd();
 	glFlush();
@@ -263,34 +258,34 @@ void GLTexImage::DrawQuadMT4()
 {
 	int w = _drawWidth, h = _drawHeight;
 	glBegin (GL_QUADS);
-		glMultiTexCoord2i( GL_TEXTURE0, 0		,   0  ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, -1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE2, 1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE3, 0		,   -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, 0		,   1  ); 
-		glVertex2i   ( 0			,		0   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, 0		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE1, -1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE2, 1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE3, 0		,   -1  );
+		glMultiTexCoord2i( GL_TEXTURE4, 0		,   1  );
+		glVertex2i   ( 0			,		0   );
 
-		glMultiTexCoord2i( GL_TEXTURE0, 0		,   h  ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, -1		,   h  ); 
-		glMultiTexCoord2i( GL_TEXTURE2, 1		,   h ); 
-		glMultiTexCoord2i( GL_TEXTURE3, 0		,   h -1 ); 
-		glMultiTexCoord2i( GL_TEXTURE4, 0		,   h +1 ); 
-		glVertex2i   ( 0			,		h   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, 0		,   h  );
+		glMultiTexCoord2i( GL_TEXTURE1, -1		,   h  );
+		glMultiTexCoord2i( GL_TEXTURE2, 1		,   h );
+		glMultiTexCoord2i( GL_TEXTURE3, 0		,   h -1 );
+		glMultiTexCoord2i( GL_TEXTURE4, 0		,   h +1 );
+		glVertex2i   ( 0			,		h   );
 
 
-		glMultiTexCoord2i( GL_TEXTURE0, w		,   h  ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   h  ); 
-		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   h  ); 
-		glMultiTexCoord2i( GL_TEXTURE3, w		,   h-1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, w		,   h+1  ); 
-		glVertex2i   ( w	,		h   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, w		,   h  );
+		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   h  );
+		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   h  );
+		glMultiTexCoord2i( GL_TEXTURE3, w		,   h-1  );
+		glMultiTexCoord2i( GL_TEXTURE4, w		,   h+1  );
+		glVertex2i   ( w	,		h   );
 
-		glMultiTexCoord2i( GL_TEXTURE0, w		,   0  ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE3, w		,   -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, w		,   1  ); 
-		glVertex2i   ( w	,		0   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, w		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE3, w		,   -1  );
+		glMultiTexCoord2i( GL_TEXTURE4, w		,   1  );
+		glVertex2i   ( w	,		0   );
 	glEnd ();
 	glFlush();
 }
@@ -301,46 +296,46 @@ void GLTexImage::DrawQuadMT8()
 	int w = _drawWidth;
 	int h = _drawHeight;
 	glBegin (GL_QUADS);
-		glMultiTexCoord2i( GL_TEXTURE0, 0		,   0  ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, -1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE2, 1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE3, 0		,   -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, 0		,   1  ); 
-		glMultiTexCoord2i( GL_TEXTURE5, -1		,   -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE6, -1		,   1  ); 
-		glMultiTexCoord2i( GL_TEXTURE7, 1		,   -1  ); 
-		glVertex2i   ( 0			,		0   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, 0		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE1, -1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE2, 1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE3, 0		,   -1  );
+		glMultiTexCoord2i( GL_TEXTURE4, 0		,   1  );
+		glMultiTexCoord2i( GL_TEXTURE5, -1		,   -1  );
+		glMultiTexCoord2i( GL_TEXTURE6, -1		,   1  );
+		glMultiTexCoord2i( GL_TEXTURE7, 1		,   -1  );
+		glVertex2i   ( 0			,		0   );
 
-		glMultiTexCoord2i( GL_TEXTURE0, 0		,   h    ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, -1		,   h    ); 
-		glMultiTexCoord2i( GL_TEXTURE2, 1		,   h    ); 
-		glMultiTexCoord2i( GL_TEXTURE3, 0		,   h  -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, 0		,   h  +1  ); 
-		glMultiTexCoord2i( GL_TEXTURE5, -1		,   h  -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE6, -1		,   h  +1  ); 
-		glMultiTexCoord2i( GL_TEXTURE7, 1		,   h  -1  ); 
-		glVertex2i   ( 0			,		h   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, 0		,   h    );
+		glMultiTexCoord2i( GL_TEXTURE1, -1		,   h    );
+		glMultiTexCoord2i( GL_TEXTURE2, 1		,   h    );
+		glMultiTexCoord2i( GL_TEXTURE3, 0		,   h  -1  );
+		glMultiTexCoord2i( GL_TEXTURE4, 0		,   h  +1  );
+		glMultiTexCoord2i( GL_TEXTURE5, -1		,   h  -1  );
+		glMultiTexCoord2i( GL_TEXTURE6, -1		,   h  +1  );
+		glMultiTexCoord2i( GL_TEXTURE7, 1		,   h  -1  );
+		glVertex2i   ( 0			,		h   );
 
 
-		glMultiTexCoord2i( GL_TEXTURE0, w		,   h    ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   h    ); 
-		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   h    ); 
-		glMultiTexCoord2i( GL_TEXTURE3, w		,   h  -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, w		,   h  +1  ); 
-		glMultiTexCoord2i( GL_TEXTURE5, w-1		,   h  -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE6, w-1		,   h  +1  ); 
-		glMultiTexCoord2i( GL_TEXTURE7, w+1		,   h  -1  ); 
-		glVertex2i   ( w	,		h   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, w		,   h    );
+		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   h    );
+		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   h    );
+		glMultiTexCoord2i( GL_TEXTURE3, w		,   h  -1  );
+		glMultiTexCoord2i( GL_TEXTURE4, w		,   h  +1  );
+		glMultiTexCoord2i( GL_TEXTURE5, w-1		,   h  -1  );
+		glMultiTexCoord2i( GL_TEXTURE6, w-1		,   h  +1  );
+		glMultiTexCoord2i( GL_TEXTURE7, w+1		,   h  -1  );
+		glVertex2i   ( w	,		h   );
 
-		glMultiTexCoord2i( GL_TEXTURE0, w		,   0  ); 	
-		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   0  ); 
-		glMultiTexCoord2i( GL_TEXTURE3, w		,   -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE4, w		,   1  ); 
-		glMultiTexCoord2i( GL_TEXTURE5, w-1		,   -1  ); 
-		glMultiTexCoord2i( GL_TEXTURE6, w-1		,   1  ); 
-		glMultiTexCoord2i( GL_TEXTURE7, w+1		,   -1  ); 
-		glVertex2i   ( w	,		0   ); 
+		glMultiTexCoord2i( GL_TEXTURE0, w		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE1, w-1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE2, w+1		,   0  );
+		glMultiTexCoord2i( GL_TEXTURE3, w		,   -1  );
+		glMultiTexCoord2i( GL_TEXTURE4, w		,   1  );
+		glMultiTexCoord2i( GL_TEXTURE5, w-1		,   -1  );
+		glMultiTexCoord2i( GL_TEXTURE6, w-1		,   1  );
+		glMultiTexCoord2i( GL_TEXTURE7, w+1		,   -1  );
+		glVertex2i   ( w	,		0   );
 	glEnd ();
 	glFlush();
 }
@@ -380,10 +375,10 @@ void GLTexImage::DrawQuad(float x1, float x2, float y1, float y2)
 {
 
 	glBegin (GL_QUADS);
-		glTexCoord2f ( x1	,   y1   ); 	glVertex2f   ( x1	,		y1   ); 
-		glTexCoord2f ( x1	,   y2  );		glVertex2f   ( x1	,		y2   ); 
- 		glTexCoord2f ( x2   ,   y2  ); 		glVertex2f   ( x2	,		y2   ); 
-		glTexCoord2f ( x2	,   y1   ); 	glVertex2f   ( x2	,		y1   ); 
+		glTexCoord2f ( x1	,   y1   ); 	glVertex2f   ( x1	,		y1   );
+		glTexCoord2f ( x1	,   y2  );		glVertex2f   ( x1	,		y2   );
+ 		glTexCoord2f ( x2   ,   y2  ); 		glVertex2f   ( x2	,		y2   );
+		glTexCoord2f ( x2	,   y1   ); 	glVertex2f   ( x2	,		y1   );
 	glEnd ();
 	glFlush();
 }
@@ -392,7 +387,7 @@ void GLTexImage::TexConvertRGB()
 {
 	//change 3/22/09
 	FrameBufferObject fbo;
-	//GlobalUtil::FitViewPort(1, 1); 
+	//GlobalUtil::FitViewPort(1, 1);
 	FitTexViewPort();
 
 	AttachToFBO(0);
@@ -421,10 +416,10 @@ void GLTexImage::DrawScaledQuad(float texscale)
 	float tx =  _imgWidth*texscale +to;
 	float ty = _imgHeight*texscale +to;
 	glBegin (GL_QUADS);
-		glTexCoord2f ( to	,   to   ); 	glVertex2i   ( 0			,		0   ); 
-		glTexCoord2f ( to	,   ty  );		glVertex2i   ( 0			,		_imgHeight   ); 
- 		glTexCoord2f ( tx	,	ty ); 		glVertex2i   ( _imgWidth	,		_imgHeight   ); 
-		glTexCoord2f ( tx	,   to   ); 	glVertex2i   ( _imgWidth	,		0   ); 
+		glTexCoord2f ( to	,   to   ); 	glVertex2i   ( 0			,		0   );
+		glTexCoord2f ( to	,   ty  );		glVertex2i   ( 0			,		_imgHeight   );
+ 		glTexCoord2f ( tx	,	ty ); 		glVertex2i   ( _imgWidth	,		_imgHeight   );
+		glTexCoord2f ( tx	,   to   ); 	glVertex2i   ( _imgWidth	,		0   );
 	glEnd ();
 	glFlush();
 }
@@ -436,30 +431,30 @@ void GLTexImage::DrawQuadReduction(int w , int h)
 	float tx = w*2 +to;
 	float ty = h*2 +to;
 	glBegin (GL_QUADS);
-		glMultiTexCoord2f ( GL_TEXTURE0, to	,	to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE1, to	+1,	to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE2, to	,	to+1  ); 
-		glMultiTexCoord2f ( GL_TEXTURE3, to	+1,	to+1  ); 
-		glVertex2i   ( 0			,		0   ); 
+		glMultiTexCoord2f ( GL_TEXTURE0, to	,	to   );
+		glMultiTexCoord2f ( GL_TEXTURE1, to	+1,	to   );
+		glMultiTexCoord2f ( GL_TEXTURE2, to	,	to+1  );
+		glMultiTexCoord2f ( GL_TEXTURE3, to	+1,	to+1  );
+		glVertex2i   ( 0			,		0   );
 
-		glMultiTexCoord2f ( GL_TEXTURE0, to	,   ty  );	
-		glMultiTexCoord2f ( GL_TEXTURE1, to	+1, ty  );	
-		glMultiTexCoord2f ( GL_TEXTURE2, to	,   ty +1 );	
-		glMultiTexCoord2f ( GL_TEXTURE3, to	+1, ty +1 );	
-		glVertex2i   ( 0			,		h   ); 
+		glMultiTexCoord2f ( GL_TEXTURE0, to	,   ty  );
+		glMultiTexCoord2f ( GL_TEXTURE1, to	+1, ty  );
+		glMultiTexCoord2f ( GL_TEXTURE2, to	,   ty +1 );
+		glMultiTexCoord2f ( GL_TEXTURE3, to	+1, ty +1 );
+		glVertex2i   ( 0			,		h   );
 
- 		glMultiTexCoord2f ( GL_TEXTURE0, tx	,	ty ); 	
- 		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1,	ty ); 	
- 		glMultiTexCoord2f ( GL_TEXTURE2, tx	,	ty +1); 	
- 		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1,	ty +1); 	
+ 		glMultiTexCoord2f ( GL_TEXTURE0, tx	,	ty );
+ 		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1,	ty );
+ 		glMultiTexCoord2f ( GL_TEXTURE2, tx	,	ty +1);
+ 		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1,	ty +1);
 
-		glVertex2i   ( w	,		h   ); 
+		glVertex2i   ( w	,		h   );
 
-		glMultiTexCoord2f ( GL_TEXTURE0, tx	,   to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1, to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE2, tx	,   to +1  ); 
-		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1, to +1  ); 
-		glVertex2i   ( w	,		0   ); 
+		glMultiTexCoord2f ( GL_TEXTURE0, tx	,   to   );
+		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1, to   );
+		glMultiTexCoord2f ( GL_TEXTURE2, tx	,   to +1  );
+		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1, to +1  );
+		glVertex2i   ( w	,		0   );
 	glEnd ();
 
 	glFlush();
@@ -472,30 +467,30 @@ void GLTexImage::DrawQuadReduction()
 	float tx = _drawWidth*2 +to;
 	float ty = _drawHeight*2 +to;
 	glBegin (GL_QUADS);
-		glMultiTexCoord2f ( GL_TEXTURE0, to	,	to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE1, to	+1,	to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE2, to	,	to+1  ); 
-		glMultiTexCoord2f ( GL_TEXTURE3, to	+1,	to+1  ); 
-		glVertex2i   ( 0			,		0   ); 
+		glMultiTexCoord2f ( GL_TEXTURE0, to	,	to   );
+		glMultiTexCoord2f ( GL_TEXTURE1, to	+1,	to   );
+		glMultiTexCoord2f ( GL_TEXTURE2, to	,	to+1  );
+		glMultiTexCoord2f ( GL_TEXTURE3, to	+1,	to+1  );
+		glVertex2i   ( 0			,		0   );
 
-		glMultiTexCoord2f ( GL_TEXTURE0, to	,   ty  );	
-		glMultiTexCoord2f ( GL_TEXTURE1, to	+1, ty  );	
-		glMultiTexCoord2f ( GL_TEXTURE2, to	,   ty +1 );	
-		glMultiTexCoord2f ( GL_TEXTURE3, to	+1, ty +1 );	
-		glVertex2i   ( 0			,		_drawHeight   ); 
+		glMultiTexCoord2f ( GL_TEXTURE0, to	,   ty  );
+		glMultiTexCoord2f ( GL_TEXTURE1, to	+1, ty  );
+		glMultiTexCoord2f ( GL_TEXTURE2, to	,   ty +1 );
+		glMultiTexCoord2f ( GL_TEXTURE3, to	+1, ty +1 );
+		glVertex2i   ( 0			,		_drawHeight   );
 
- 		glMultiTexCoord2f ( GL_TEXTURE0, tx	,	ty ); 	
- 		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1,	ty ); 	
- 		glMultiTexCoord2f ( GL_TEXTURE2, tx	,	ty +1); 	
- 		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1,	ty +1); 	
+ 		glMultiTexCoord2f ( GL_TEXTURE0, tx	,	ty );
+ 		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1,	ty );
+ 		glMultiTexCoord2f ( GL_TEXTURE2, tx	,	ty +1);
+ 		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1,	ty +1);
 
-		glVertex2i   ( _drawWidth	,		_drawHeight   ); 
+		glVertex2i   ( _drawWidth	,		_drawHeight   );
 
-		glMultiTexCoord2f ( GL_TEXTURE0, tx	,   to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1, to   ); 
-		glMultiTexCoord2f ( GL_TEXTURE2, tx	,   to +1  ); 
-		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1, to +1  ); 
-		glVertex2i   ( _drawWidth	,		0   ); 
+		glMultiTexCoord2f ( GL_TEXTURE0, tx	,   to   );
+		glMultiTexCoord2f ( GL_TEXTURE1, tx	+1, to   );
+		glMultiTexCoord2f ( GL_TEXTURE2, tx	,   to +1  );
+		glMultiTexCoord2f ( GL_TEXTURE3, tx	+1, to +1  );
+		glVertex2i   ( _drawWidth	,		0   );
 	glEnd ();
 
 	glFlush();
@@ -515,7 +510,7 @@ void GLTexPacked::TexConvertRGB()
 
 	//input
 	glBindTexture(_texTarget, oldTexID);
-	//output 
+	//output
 	AttachToFBO(0);
 	//program
 	ShaderMan::UseShaderRGB2Gray();
@@ -540,7 +535,7 @@ void GLTexPacked::InitTexture( int width,  int height, int clamp_to_edge)
 {
 
 	if(_texID && width == _imgWidth && height == _imgHeight ) return;
-	if(_texID==0)	glGenTextures(1, &_texID); 
+	if(_texID==0)	glGenTextures(1, &_texID);
 
 	_imgWidth = width;
 	_imgHeight = height;
@@ -560,20 +555,20 @@ void GLTexPacked::InitTexture( int width,  int height, int clamp_to_edge)
 
 	if(clamp_to_edge)
 	{
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}else
 	{
 		//out of bound tex read returns 0??
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	}
-	glTexParameteri(_texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
-	glTexParameteri(_texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(_texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(_texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	glTexImage2D(_texTarget, 0, _iTexFormat, 
-		_texWidth, _texHeight, 0, GL_RGBA, GL_FLOAT, NULL); 
+	glTexImage2D(_texTarget, 0, _iTexFormat,
+		_texWidth, _texHeight, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	UnbindTex();
 
@@ -584,12 +579,12 @@ void  GLTexPacked::DrawImage()
 {
 	float x1 =0,  y1 = 0; //border..
 	float x2 = _imgWidth*0.5f +x1;
-	float y2 = _imgHeight*0.5f + y1; 
+	float y2 = _imgHeight*0.5f + y1;
 	glBegin (GL_QUADS);
-		glTexCoord2f ( x1	,   y1  ); 			glVertex2i   ( 0			,		0   ); 
-		glTexCoord2f ( x1	,   y2 );			glVertex2i   ( 0			,		_imgHeight   ); 
- 		glTexCoord2f ( x2   ,   y2  ); 			glVertex2i   ( _imgWidth	,		_imgHeight   ); 
-		glTexCoord2f ( x2	,   y1   ); 		glVertex2i   ( _imgWidth	,		0   ); 
+		glTexCoord2f ( x1	,   y1  ); 			glVertex2i   ( 0			,		0   );
+		glTexCoord2f ( x1	,   y2 );			glVertex2i   ( 0			,		_imgHeight   );
+ 		glTexCoord2f ( x2   ,   y2  ); 			glVertex2i   ( _imgWidth	,		_imgHeight   );
+		glTexCoord2f ( x2	,   y1   ); 		glVertex2i   ( _imgWidth	,		0   );
 	glEnd ();
 	glFlush();
 }
@@ -603,29 +598,29 @@ void GLTexPacked::DrawQuadUS(int scale)
 	float y2 = th * texscale + y1;
 	float step = texscale *0.5f;
 	glBegin (GL_QUADS);
-		glMultiTexCoord2f( GL_TEXTURE0, x1		,   y1      ); 	
-		glMultiTexCoord2f( GL_TEXTURE1, x1+step	,   y1      ); 	
-		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y1 +step); 	
-		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y1 +step); 	
-		glVertex2i   ( 0			,		0   ); 
+		glMultiTexCoord2f( GL_TEXTURE0, x1		,   y1      );
+		glMultiTexCoord2f( GL_TEXTURE1, x1+step	,   y1      );
+		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y1 +step);
+		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y1 +step);
+		glVertex2i   ( 0			,		0   );
 
-		glMultiTexCoord2f( GL_TEXTURE0, x1		,	y2      );	
+		glMultiTexCoord2f( GL_TEXTURE0, x1		,	y2      );
 		glMultiTexCoord2f( GL_TEXTURE1, x1+step	,   y2      );
-		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y2 +step);	
-		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y2 +step);	
-		glVertex2i   ( 0			,	th   ); 
+		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y2 +step);
+		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y2 +step);
+		glVertex2i   ( 0			,	th   );
 
 		glMultiTexCoord2f( GL_TEXTURE0, x2		,   y2      );
 		glMultiTexCoord2f( GL_TEXTURE1, x2+step	,   y2      );
 		glMultiTexCoord2f( GL_TEXTURE2, x2   	,   y2 +step);
 		glMultiTexCoord2f( GL_TEXTURE3, x2+step	,   y2 +step);
-		glVertex2i   ( tw	,	th   ); 
+		glVertex2i   ( tw	,	th   );
 
-		glMultiTexCoord2f( GL_TEXTURE0, x2		,   y1      );	
+		glMultiTexCoord2f( GL_TEXTURE0, x2		,   y1      );
 		glMultiTexCoord2f( GL_TEXTURE1, x2+step	,   y1      );
-		glMultiTexCoord2f( GL_TEXTURE2, x2   	,   y1 +step);	
-		glMultiTexCoord2f( GL_TEXTURE3, x2+step	,   y1 +step);		
-		glVertex2i   ( tw	,	0   ); 
+		glMultiTexCoord2f( GL_TEXTURE2, x2   	,   y1 +step);
+		glMultiTexCoord2f( GL_TEXTURE3, x2+step	,   y1 +step);
+		glVertex2i   ( tw	,	0   );
 	glEnd ();
 }
 
@@ -640,29 +635,29 @@ void GLTexPacked::DrawQuadDS(int scale)
 	int step = scale / 2;
 
 	glBegin (GL_QUADS);
-		glMultiTexCoord2f( GL_TEXTURE0, x1		,   y1      ); 	
-		glMultiTexCoord2f( GL_TEXTURE1, x1+step	,   y1      ); 	
-		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y1 +step); 	
-		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y1 +step); 	
-		glVertex2i   ( 0			,		0   ); 
+		glMultiTexCoord2f( GL_TEXTURE0, x1		,   y1      );
+		glMultiTexCoord2f( GL_TEXTURE1, x1+step	,   y1      );
+		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y1 +step);
+		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y1 +step);
+		glVertex2i   ( 0			,		0   );
 
-		glMultiTexCoord2f( GL_TEXTURE0, x1		,	y2      );	
+		glMultiTexCoord2f( GL_TEXTURE0, x1		,	y2      );
 		glMultiTexCoord2f( GL_TEXTURE1, x1+step	,   y2      );
-		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y2 +step);	
-		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y2 +step);	
-		glVertex2i   ( 0			,	th   ); 
+		glMultiTexCoord2f( GL_TEXTURE2, x1   	,   y2 +step);
+		glMultiTexCoord2f( GL_TEXTURE3, x1+step	,   y2 +step);
+		glVertex2i   ( 0			,	th   );
 
 		glMultiTexCoord2f( GL_TEXTURE0, x2		,   y2      );
 		glMultiTexCoord2f( GL_TEXTURE1, x2+step	,   y2      );
 		glMultiTexCoord2f( GL_TEXTURE2, x2   	,   y2 +step);
 		glMultiTexCoord2f( GL_TEXTURE3, x2+step	,   y2 +step);
-		glVertex2i   ( tw	,	th   ); 
+		glVertex2i   ( tw	,	th   );
 
-		glMultiTexCoord2f( GL_TEXTURE0, x2		,   y1      );	
+		glMultiTexCoord2f( GL_TEXTURE0, x2		,   y1      );
 		glMultiTexCoord2f( GL_TEXTURE1, x2+step	,   y1      );
-		glMultiTexCoord2f( GL_TEXTURE2, x2   	,   y1 +step);	
-		glMultiTexCoord2f( GL_TEXTURE3, x2+step	,   y1 +step);		
-		glVertex2i   ( tw	,	0   ); 
+		glMultiTexCoord2f( GL_TEXTURE2, x2   	,   y1 +step);
+		glMultiTexCoord2f( GL_TEXTURE3, x2+step	,   y1 +step);
+		glVertex2i   ( tw	,	0   );
 	glEnd ();
 }
 
@@ -672,8 +667,8 @@ void GLTexPacked::ZeroHistoMargin()
 	int marginy = (((-_imgHeight + 3)/4)*4) - _imgHeight;
 	if(marginx >0 || marginy > 0)
 	{
-		int tw = (_imgWidth + marginx ) >> 1;	
-		int th = (_imgHeight + marginy ) >> 1;	
+		int tw = (_imgWidth + marginx ) >> 1;
+		int th = (_imgHeight + marginy ) >> 1;
 		tw = min(_texWidth, tw );
 		th = min(_texHeight, th);
 		GlobalUtil::FitViewPort(tw, th);
@@ -708,17 +703,17 @@ void GLTexPacked::DrawMargin(int right, int bottom, int mx, int my)
 	glBegin(GL_QUADS);
 	if(right>tw && mx)
 	{
-		glTexCoord2i ( tw	,   0   ); 				glVertex2i   ( tw	,		0   ); 
-		glTexCoord2i ( tw	,   bottom  );			glVertex2i   ( tw	,		bottom   ); 
-		glTexCoord2i ( right,   bottom  ); 			glVertex2i   ( right,		bottom   ); 
-		glTexCoord2i ( right,   0   ); 				glVertex2i   ( right,		0   ); 	
+		glTexCoord2i ( tw	,   0   ); 				glVertex2i   ( tw	,		0   );
+		glTexCoord2i ( tw	,   bottom  );			glVertex2i   ( tw	,		bottom   );
+		glTexCoord2i ( right,   bottom  ); 			glVertex2i   ( right,		bottom   );
+		glTexCoord2i ( right,   0   ); 				glVertex2i   ( right,		0   );
 	}
 	if(bottom>th && my)
 	{
-		glTexCoord2i ( 0	,   th  ); 		glVertex2i   ( 0	,		th   ); 
-		glTexCoord2i ( 0	,   bottom	);	glVertex2i   ( 0	,		bottom	 ); 
-		glTexCoord2i ( tw	,   bottom	); 	glVertex2i   ( tw	,		bottom	 ); 
-		glTexCoord2i ( tw	,   th	); 		glVertex2i   ( tw	,		th	 ); 
+		glTexCoord2i ( 0	,   th  ); 		glVertex2i   ( 0	,		th   );
+		glTexCoord2i ( 0	,   bottom	);	glVertex2i   ( 0	,		bottom	 );
+		glTexCoord2i ( tw	,   bottom	); 	glVertex2i   ( tw	,		bottom	 );
+		glTexCoord2i ( tw	,   th	); 		glVertex2i   ( tw	,		th	 );
 	}
 	glEnd();
 	glFlush();
@@ -735,17 +730,17 @@ void GLTexImage::UnbindMultiTex(int n)
 	}
 }
 
-template <class Uint> int 
+template <class Uint> int
 
 #if !defined(_MSC_VER) || _MSC_VER > 1200
 GLTexInput::
 #endif
 
-DownSamplePixelDataI(unsigned int gl_format, int width, int height, int ds, 
-									const Uint * pin, Uint * pout)	
+DownSamplePixelDataI(unsigned int gl_format, int width, int height, int ds,
+									const Uint * pin, Uint * pout)
 {
 	int step, linestep;
-	int i, j; 
+	int i, j;
 	int ws = width/ds;
 	int hs = height/ds;
 	const Uint * line = pin, * p;
@@ -754,8 +749,8 @@ DownSamplePixelDataI(unsigned int gl_format, int width, int height, int ds,
 	{
 	case GL_LUMINANCE:
 	case GL_LUMINANCE_ALPHA:
-		step = ds * (gl_format == GL_LUMINANCE? 1: 2); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_LUMINANCE? 1: 2);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
@@ -766,8 +761,8 @@ DownSamplePixelDataI(unsigned int gl_format, int width, int height, int ds,
 		break;
 	case GL_RGB:
 	case GL_RGBA:
-		step = ds * (gl_format == GL_RGB? 3: 4); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_RGB? 3: 4);
+		linestep = width * step;
 
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
@@ -780,8 +775,8 @@ DownSamplePixelDataI(unsigned int gl_format, int width, int height, int ds,
 		break;
 	case GL_BGR:
 	case GL_BGRA:
-		step = ds * (gl_format == GL_BGR? 3: 4); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_BGR? 3: 4);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
@@ -799,40 +794,40 @@ DownSamplePixelDataI(unsigned int gl_format, int width, int height, int ds,
 }
 
 
-template <class Uint> int 
+template <class Uint> int
 
 #if !defined(_MSC_VER) || _MSC_VER > 1200
 GLTexInput::
 #endif
 
-DownSamplePixelDataI2F(unsigned int gl_format, int width, int height, int ds, 
-									const Uint * pin, float * pout, int skip)	
+DownSamplePixelDataI2F(unsigned int gl_format, int width, int height, int ds,
+									const Uint * pin, float * pout, int skip)
 {
 	int step, linestep;
-	int i, j; 
+	int i, j;
 	int ws = width/ds - skip;
 	int hs = height/ds;
 	const Uint * line = pin, * p;
 	float *po = pout;
-    const float factor = (sizeof(Uint) == 1? 255.0f : 65535.0f); 
+    const float factor = (sizeof(Uint) == 1? 255.0f : 65535.0f);
 	switch(gl_format)
 	{
 	case GL_LUMINANCE:
 	case GL_LUMINANCE_ALPHA:
-		step = ds * (gl_format == GL_LUMINANCE? 1: 2); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_LUMINANCE? 1: 2);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
 			{
-				*po++ = (*p) / factor; 
+				*po++ = (*p) / factor;
 			}
 		}
 		break;
 	case GL_RGB:
 	case GL_RGBA:
-		step = ds * (gl_format == GL_RGB? 3: 4); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_RGB? 3: 4);
+		linestep = width * step;
 
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
@@ -845,8 +840,8 @@ DownSamplePixelDataI2F(unsigned int gl_format, int width, int height, int ds,
 		break;
 	case GL_BGR:
 	case GL_BGRA:
-		step = ds * (gl_format == GL_BGR? 3: 4); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_BGR? 3: 4);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
@@ -861,10 +856,10 @@ DownSamplePixelDataI2F(unsigned int gl_format, int width, int height, int ds,
 	return 1;
 }
 
-int GLTexInput::DownSamplePixelDataF(unsigned int gl_format, int width, int height, int ds, const float * pin, float * pout, int skip)	
+int GLTexInput::DownSamplePixelDataF(unsigned int gl_format, int width, int height, int ds, const float * pin, float * pout, int skip)
 {
 	int step, linestep;
-	int i, j; 
+	int i, j;
 	int ws = width/ds - skip;
 	int hs = height/ds;
 	const float * line = pin, * p;
@@ -873,8 +868,8 @@ int GLTexInput::DownSamplePixelDataF(unsigned int gl_format, int width, int heig
 	{
 	case GL_LUMINANCE:
 	case GL_LUMINANCE_ALPHA:
-		step = ds * (gl_format == GL_LUMINANCE? 1: 2); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_LUMINANCE? 1: 2);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
@@ -885,8 +880,8 @@ int GLTexInput::DownSamplePixelDataF(unsigned int gl_format, int width, int heig
 		break;
 	case GL_RGB:
 	case GL_RGBA:
-		step = ds * (gl_format == GL_RGB? 3: 4); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_RGB? 3: 4);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
@@ -897,13 +892,13 @@ int GLTexInput::DownSamplePixelDataF(unsigned int gl_format, int width, int heig
 		break;
 	case GL_BGR:
 	case GL_BGRA:
-		step = ds * (gl_format == GL_BGR? 3: 4); 
-		linestep = width * step; 
+		step = ds * (gl_format == GL_BGR? 3: 4);
+		linestep = width * step;
 		for(i = 0 ; i < hs; i++, line+=linestep)
 		{
 			for(j = 0, p = line; j < ws; j++, p+=step)
 			{
-				*po++ = (0.114f*p[0] + 0.587f*p[1] + 0.299f * p[2]); 
+				*po++ = (0.114f*p[0] + 0.587f*p[1] + 0.299f * p[2]);
 			}
 		}
 		break;
@@ -915,31 +910,31 @@ int GLTexInput::DownSamplePixelDataF(unsigned int gl_format, int width, int heig
 
 }
 
-int GLTexInput::SetImageData( int width,  int height, const void * data, 
+int GLTexInput::SetImageData( int width,  int height, const void * data,
 							 unsigned int gl_format, unsigned int gl_type )
 {
 	int simple_format = IsSimpleGlFormat(gl_format, gl_type);//no cpu code to handle other formats
 	int ws, hs, done = 1;
-	
+
 	if(_converted_data) {delete [] _converted_data; _converted_data  = NULL; }
 
-	_rgb_converted = 1; 
-    _data_modified = 0; 
+	_rgb_converted = 1;
+    _data_modified = 0;
 
-	if( simple_format 
-		&& ( width > _texMaxDim || height > _texMaxDim || GlobalUtil::_PreProcessOnCPU) 
+	if( simple_format
+		&& ( width > _texMaxDim || height > _texMaxDim || GlobalUtil::_PreProcessOnCPU)
 		&& GlobalUtil::_octave_min_default >0   )
 	{
-		_down_sampled = GlobalUtil::_octave_min_default; 
+		_down_sampled = GlobalUtil::_octave_min_default;
 		ws = width >> GlobalUtil::_octave_min_default;
 		hs = height >> GlobalUtil::_octave_min_default;
 	}else
 	{
-		_down_sampled = 0; 
+		_down_sampled = 0;
 		ws = width;
 		hs = height;
 	}
-	
+
 	if ( ws > _texMaxDim || hs > _texMaxDim)
 	{
 		if(simple_format)
@@ -958,7 +953,7 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
 		}
 	}
 
-	_texWidth = _imgWidth = _drawWidth = ws;	
+	_texWidth = _imgWidth = _drawWidth = ws;
 	_texHeight = _imgHeight = _drawHeight = hs;
 
 	if(GlobalUtil::_verbose)
@@ -972,9 +967,9 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
     {
         //////////////////////////////////////
         int tWidth = TruncateWidthCU(_imgWidth);
-        int skip = _imgWidth - tWidth; 
+        int skip = _imgWidth - tWidth;
         //skip = 0;
-        if(!simple_format) 
+        if(!simple_format)
         {
             std::cerr << "Input format not supported under current settings.\n";
             return 0;
@@ -982,10 +977,10 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
         {
 		    _converted_data = new float [_imgWidth * _imgHeight];
             if(gl_type == GL_UNSIGNED_BYTE)
-		        DownSamplePixelDataI2F(gl_format, width, height, 1<<_down_sampled, 
+		        DownSamplePixelDataI2F(gl_format, width, height, 1<<_down_sampled,
                                         ((const unsigned char*) data), _converted_data, skip);
 	        else if(gl_type == GL_UNSIGNED_SHORT)
-		        DownSamplePixelDataI2F(gl_format, width, height, 1<<_down_sampled, 
+		        DownSamplePixelDataI2F(gl_format, width, height, 1<<_down_sampled,
                                         ((const unsigned short*) data), _converted_data, skip);
 	        else
 		        DownSamplePixelDataF(gl_format, width, height, 1<<_down_sampled, (float*)data, _converted_data, skip);
@@ -999,22 +994,22 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
             if(skip > 0)
             {
                 for(int i = 1; i < _imgHeight; ++i)
-                {   
+                {
                     float * dst = ((float*)data) + i * tWidth, * src = ((float*)data) + i * _imgWidth;
                     for(int j = 0; j < tWidth; ++j) *dst++ = * src++;
                 }
             }
         }
         _texWidth = _imgWidth = _drawWidth = tWidth;
-        _data_modified = 1; 
+        _data_modified = 1;
     }else
     {
-	    if(_texID ==0)		glGenTextures(1, &_texID); 
-	    glBindTexture(_texTarget, _texID); 
+	    if(_texID ==0)		glGenTextures(1, &_texID);
+	    glBindTexture(_texTarget, _texID);
 	    CheckErrorsGL("glBindTexture");
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
-		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
-	    glPixelStorei(GL_UNPACK_ALIGNMENT , 1); 
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (_texTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	    glPixelStorei(GL_UNPACK_ALIGNMENT , 1);
 
 	    if(simple_format && ( _down_sampled> 0 || (gl_format != GL_LUMINANCE && GlobalUtil::_PreProcessOnCPU) ))
 	    {
@@ -1031,7 +1026,7 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
 		    {
 			    unsigned short * newdata = new unsigned short [_imgWidth * _imgHeight];
 			    DownSamplePixelDataI(gl_format, width, height, 1<<_down_sampled, ((const unsigned short*) data), newdata);
-    			
+
 			    glTexImage2D(_texTarget, 0, GL_LUMINANCE32F_ARB,   //internal format changed
                     _imgWidth, _imgHeight, 0,
 					GL_LUMINANCE, GL_UNSIGNED_SHORT, newdata);
@@ -1056,15 +1051,15 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
 		    //ds must be 0 here if not simpleformat
 		    if(gl_format == GL_LUMINANCE || gl_format == GL_LUMINANCE_ALPHA)
             {
-                //use one channel internal format if data is intensity image 
-                glTexImage2D(_texTarget, 0, GL_LUMINANCE32F_ARB, 
-                _imgWidth, _imgHeight, 0, gl_format,	gl_type, data); 
+                //use one channel internal format if data is intensity image
+                glTexImage2D(_texTarget, 0, GL_LUMINANCE32F_ARB,
+                _imgWidth, _imgHeight, 0, gl_format,	gl_type, data);
 			    GlobalUtil::FitViewPort(1, 1); //this used to be necessary
             }
 		    else
             {
 	    	    //convert RGB 2 GRAY if needed
-                glTexImage2D(_texTarget, 0,  _iTexFormat, _imgWidth, _imgHeight, 0, gl_format, gl_type, data); 
+                glTexImage2D(_texTarget, 0,  _iTexFormat, _imgWidth, _imgHeight, 0, gl_format, gl_type, data);
                 if(ShaderMan::HaveShaderMan())
 			        TexConvertRGB();
 		        else
@@ -1079,14 +1074,14 @@ int GLTexInput::SetImageData( int width,  int height, const void * data,
 
 GLTexInput::~GLTexInput()
 {
-    if(_converted_data) delete [] _converted_data; 
+    if(_converted_data) delete [] _converted_data;
 }
 
 
 int GLTexInput::LoadImageFile(char *imagepath, int &w, int &h )
 {
 #ifndef SIFTGPU_NO_DEVIL
-    static int devil_loaded = 0; 
+    static int devil_loaded = 0;
 	unsigned int imID;
 	int done = 1;
 
@@ -1095,12 +1090,12 @@ int GLTexInput::LoadImageFile(char *imagepath, int &w, int &h )
 	    ilInit();
 	    ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 	    ilEnable(IL_ORIGIN_SET);
-        devil_loaded = 1; 
+        devil_loaded = 1;
     }
 
 	///
 	ilGenImages(1, &imID);
-	ilBindImage(imID); 
+	ilBindImage(imID);
 
 	if(ilLoadImage(imagepath))
 	{
@@ -1122,13 +1117,13 @@ int GLTexInput::LoadImageFile(char *imagepath, int &w, int &h )
 		done = 0;
 	}
 
-	ilDeleteImages(1, &imID); 
+	ilDeleteImages(1, &imID);
 
 	return done;
 #else
 	FILE * file = fopen(imagepath, "rb"); if (file ==NULL) return 0;
 
-	char buf[8];	int  width, height, cn, g, done = 1; 
+	char buf[8];	int  width, height, cn, g, done = 1;
 
 	if(fscanf(file, "%s %d %d %d", buf, &width, &height, &cn )<4 ||  cn > 255 || width < 0 || height < 0)
 	{
@@ -1138,7 +1133,7 @@ int GLTexInput::LoadImageFile(char *imagepath, int &w, int &h )
 	}else
     {
         w = width;
-        h = height; 
+        h = height;
     }
     unsigned char * data = new unsigned char[width * height];
 	unsigned char * pixels = data;
@@ -1183,7 +1178,7 @@ int GLTexInput::LoadImageFile(char *imagepath, int &w, int &h )
 	}
     if(done)    SetImageData(width, height, data, GL_LUMINANCE, GL_UNSIGNED_BYTE);
 	fclose(file);
-    delete data; 
+    delete data;
     if(GlobalUtil::_verbose && done) std::cout<< "Image loaded :\t" << imagepath << "\n";
 	return 1;
 #endif
@@ -1192,14 +1187,14 @@ int GLTexInput::LoadImageFile(char *imagepath, int &w, int &h )
 int GLTexImage::CopyToPBO(GLuint pbo, int width, int height, GLenum format)
 {
     /////////
-    if(format != GL_RGBA && format != GL_LUMINANCE) return 0; 
+    if(format != GL_RGBA && format != GL_LUMINANCE) return 0;
 
 	FrameBufferObject fbo;
     GLint bsize, esize = width * height * sizeof(float) * (format == GL_RGBA ? 4 : 1);
 	AttachToFBO(0);
 	glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, pbo);
 	glGetBufferParameteriv(GL_PIXEL_PACK_BUFFER_ARB, GL_BUFFER_SIZE, &bsize);
-	if(bsize < esize) 
+	if(bsize < esize)
 	{
 		glBufferData(GL_PIXEL_PACK_BUFFER_ARB, esize,	NULL, GL_STATIC_DRAW_ARB);
 		glGetBufferParameteriv(GL_PIXEL_PACK_BUFFER_ARB, GL_BUFFER_SIZE, &bsize);
@@ -1244,7 +1239,7 @@ void GLTexInput::VerifyTexture()
                     _imgWidth, _imgHeight, 0,
 					GL_LUMINANCE, GL_FLOAT, _pixel_data);
     UnbindTex();
-    _data_modified = 0; 
+    _data_modified = 0;
 }
 
 void GLTexImage::CopyFromPBO(GLuint pbo, int width, int height, GLenum format)
